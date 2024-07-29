@@ -6,6 +6,7 @@
 - 加速地址： https://docker.m.daocloud.io/
 - es、kibana部署参考教程 https://juejin.cn/post/7241374490491879480
 - https://www.topgoer.com/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%93%8D%E4%BD%9C/go%E6%93%8D%E4%BD%9Celasticsearch/elasticsearch%E4%BB%8B%E7%BB%8D.html
+- 中文教程：https://learnku.com/docs/elasticsearch73/7.3/data-in-documents-and-indices/6446
 
 # 步骤
 - docker-compose up 拉取镜像和启动服务
