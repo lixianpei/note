@@ -30,9 +30,10 @@ Redis Stream 提供了消息的持久化和主备复制功能，可以让任何�
     代码文件位置：github.com\redis\go-redis\v9@v9.6.1\pubsub.go
 ```
 func (c *channel) initHealthCheck() {
-ctx := context.TODO()//创建一个上下文 ctx，在此上下文中执行健康检查
-c.ping = make(chan struct{}, 1)//初始化一个容量为 1 的 ping 通道，用于接收外部的健康检查信号。
-	//启动一个新的 goroutine 进行健康检查
+    ctx := context.TODO()//创建一个上下文 ctx，在此上下文中执行健康检查
+    c.ping = make(chan struct{}, 1)//初始化一个容量为 1 的 ping 通道，用于接收外部的健康检查信号。
+	
+	#启动一个新的 goroutine 进行健康检查
 	go func() {
 		//创建一个定时器 timer，初始设置为 1 分钟，但立即停止它，以便稍后重用
 		timer := time.NewTimer(time.Minute) 
