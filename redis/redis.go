@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/redis/go-redis/v9"
+	"strings"
 	"time"
 )
 
@@ -16,11 +17,16 @@ const RedisPassword = "78KJtyjg0928abc"
 
 func init() {
 	//利用选项模式进行初始化Redis客户端
-	RedisCli = NewRedisClient(
+	c, err := NewRedisClient(
 		WithAddress(RedisAddress),
 		WithPassword(RedisPassword),
 		WithPrefix("Li:"),
 	)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	RedisCli = c
 }
 
 type RedisClient struct {
@@ -30,7 +36,7 @@ type RedisClient struct {
 }
 
 // NewRedisClient 创建一个Redis客户端
-func NewRedisClient(options ...RedisClientOption) *RedisClient {
+func NewRedisClient(options ...RedisClientOption) (*RedisClient, error) {
 	//初始化空结构体
 	c := &RedisClient{
 		Client:  nil,
@@ -40,36 +46,47 @@ func NewRedisClient(options ...RedisClientOption) *RedisClient {
 
 	//由于redis参数非常多，这里提供选项模式对redis参数进行选择性初始化，提供扩展效率
 	for _, option := range options {
-		option(c) //这里可以考虑调整为c，可以让自定义的prefix也可以使用选项模式
+		if err := option(c); err != nil {
+			return nil, err
+		}
 	}
 
 	//初始化client参数
 	c.Client = redis.NewClient(c.options)
 
-	return c
+	return c, nil
 }
 
 // RedisClientOption 是一个redis配置选项函数类型
-type RedisClientOption func(options *RedisClient)
+type RedisClientOption func(options *RedisClient) error
 
 // WithPassword 返回一个设置 password 的选项函数
 func WithPassword(password string) RedisClientOption {
-	return func(c *RedisClient) {
+	return func(c *RedisClient) error {
 		c.options.Password = password
+		return nil
 	}
 }
 
 // WithAddress 返回一个设置 address 的选项函数
 func WithAddress(address string) RedisClientOption {
-	return func(c *RedisClient) {
+	return func(c *RedisClient) error {
+		if len(address) == 0 {
+			return errors.New("redis address 不能为空")
+		}
+		if strings.Count(address, ":") != 1 {
+			return errors.New("redis address 格式错误，正确格式为：{host}:{port}")
+		}
 		c.options.Addr = address
+		return nil
 	}
 }
 
 // WithPrefix 返回一个设置 prefix 的选项函数
 func WithPrefix(prefix string) RedisClientOption {
-	return func(c *RedisClient) {
+	return func(c *RedisClient) error {
 		c.prefix = prefix
+		return nil
 	}
 }
 
